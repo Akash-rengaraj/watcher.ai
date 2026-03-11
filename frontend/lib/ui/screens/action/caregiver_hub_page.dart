@@ -77,13 +77,13 @@ class CaregiverHubPage extends StatelessWidget {
           height: 80,
           child: ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              backgroundColor: AppTheme.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            icon: const Icon(Icons.call, size: 32, color: AppTheme.textPrimary),
+            icon: const Icon(Icons.call, size: 32, color: Colors.white),
             label: const FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text("Call Doctor", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+              child: Text("Call Doctor", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
             ),
             onPressed: () async {
               final phone = context.read<AppProvider>().settings.doctorPhone;
@@ -102,7 +102,7 @@ class CaregiverHubPage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.neonRed.withOpacity(0.1),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(12),
                 side: const BorderSide(color: AppTheme.neonRed, width: 2),
               ),
             ),
@@ -127,8 +127,8 @@ class CaregiverHubPage extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12.0),
       child: ExpansionTile(
-        title: Text(title, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-        iconColor: AppTheme.mistyGreen,
+        title: Text(title, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: AppTheme.primary)),
+        iconColor: AppTheme.primary,
         collapsedIconColor: AppTheme.textSecondary,
         children: [
           Padding(

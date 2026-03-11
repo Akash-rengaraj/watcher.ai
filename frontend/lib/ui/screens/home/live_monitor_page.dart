@@ -38,7 +38,9 @@ class LiveMonitorPage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 20),
                   _buildOverallHealthIndicator(context, score),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
+                  Text("Live Vitals", style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 16),
                   LayoutBuilder(
                     builder: (context, constraints) {
                       // Calculate a responsive aspect ratio
@@ -84,15 +86,6 @@ class LiveMonitorPage extends StatelessWidget {
                       );
                     }
                   ),
-                  const SizedBox(height: 40),
-                  Center(
-                    child: Text(
-                      "ESP32 Connected | Last synced: Just now",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.textSecondary.withOpacity(0.6),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -103,57 +96,106 @@ class LiveMonitorPage extends StatelessWidget {
   }
 
   Widget _buildOverallHealthIndicator(BuildContext context, int score) {
-    Color glowColor = score > 80 ? AppTheme.mistyGreen : (score > 60 ? AppTheme.harshAmber : AppTheme.neonRed);
+    Color statusColor = score > 80 ? AppTheme.mistyGreen : (score > 60 ? AppTheme.harshAmber : AppTheme.neonRed);
 
-    return Center(
-      child: Container(
-        width: 220,
-        height: 220,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: glowColor.withOpacity(0.15),
-              blurRadius: 40,
-              spreadRadius: 10,
-            ),
-          ],
-        ),
-        child: Stack(
-          alignment: Alignment.center,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 200,
-              height: 200,
-              child: CircularProgressIndicator(
-                value: score / 100,
-                strokeWidth: 8,
-                backgroundColor: AppTheme.surface,
-                valueColor: AlwaysStoppedAnimation<Color>(glowColor),
-                strokeCap: StrokeCap.round,
-              ),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    "$score",
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                      color: glowColor,
-                      shadows: [
-                        Shadow(color: glowColor.withOpacity(0.5), blurRadius: 10),
-                      ]
-                    ),
+                Expanded(
+                  child: Row(
+                    children: [
+                       Container(
+                         width: 48,
+                         height: 48,
+                         decoration: BoxDecoration(
+                           color: AppTheme.primary.withOpacity(0.1),
+                           shape: BoxShape.circle,
+                         ),
+                         child: const Icon(Icons.person, color: AppTheme.primary),
+                       ),
+                       const SizedBox(width: 16),
+                       Expanded(
+                         child: Column(
+                           crossAxisAlignment: CrossAxisAlignment.start,
+                           children: [
+                             FittedBox(
+                               fit: BoxFit.scaleDown,
+                               alignment: Alignment.centerLeft,
+                               child: Text("John Doe", style: Theme.of(context).textTheme.titleLarge),
+                             ),
+                             FittedBox(
+                               fit: BoxFit.scaleDown,
+                               alignment: Alignment.centerLeft,
+                               child: Row(
+                                 children: [
+                                   Container(
+                                     width: 8, height: 8,
+                                     decoration: const BoxDecoration(color: AppTheme.mistyGreen, shape: BoxShape.circle),
+                                   ),
+                                   const SizedBox(width: 6),
+                                   Text("Device: Connected", style: Theme.of(context).textTheme.bodyMedium),
+                                 ],
+                               ),
+                             )
+                           ],
+                         ),
+                       ),
+                    ]
                   ),
                 ),
-                Text(
-                  "Overall Stable",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        "$score",
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: statusColor),
+                      ),
+                      const SizedBox(width: 4),
+                      Text("Health\nScore", style: Theme.of(context).textTheme.labelSmall?.copyWith(color: statusColor, fontSize: 10)),
+                    ],
+                  ),
+                )
               ],
             ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.background,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.auto_awesome, color: AppTheme.primary, size: 20),
+                      const SizedBox(width: 8),
+                      Text("AI Health Status", style: Theme.of(context).textTheme.titleMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    score > 80 
+                      ? "John's vitals are currently within the normal optimal range. No immediate action is required." 
+                      : "Warning: Vitals are experiencing abnormal fluctuations. Please prepare to review playbooks.",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),

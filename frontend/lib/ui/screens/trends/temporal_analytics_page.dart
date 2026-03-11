@@ -133,12 +133,12 @@ class _TemporalAnalyticsPageState extends State<TemporalAnalyticsPage> {
                     gridData: FlGridData(
                       show: true,
                       drawVerticalLine: false,
-                      getDrawingHorizontalLine: (value) => const FlLine(color: Colors.white10, strokeWidth: 1),
+                      getDrawingHorizontalLine: (value) => FlLine(color: AppTheme.textSecondary.withAlpha(50), strokeWidth: 1),
                     ),
                     lineTouchData: LineTouchData(
                       enabled: true,
                       touchTooltipData: LineTouchTooltipData(
-                        getTooltipColor: (touchedSpot) => AppTheme.surface.withAlpha(200),
+                        getTooltipColor: (touchedSpot) => AppTheme.surface.withAlpha(240),
                         getTooltipItems: (touchedSpots) {
                           return touchedSpots.map((spot) {
                             return LineTooltipItem(
@@ -156,7 +156,7 @@ class _TemporalAnalyticsPageState extends State<TemporalAnalyticsPage> {
                           showTitles: true,
                           reservedSize: 40,
                           getTitlesWidget: (value, meta) {
-                            return Text(value.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.white54));
+                            return Text(value.toInt().toString(), style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary));
                           },
                         ),
                       ),
@@ -170,10 +170,10 @@ class _TemporalAnalyticsPageState extends State<TemporalAnalyticsPage> {
                             if (index >= 0 && index < data.length) {
                                 // Calculate hours ago based on the timestamp
                                 final hoursDiff = DateTime.now().difference(data[index].timestamp).inHours;
-                                if (hoursDiff == 0) return const Padding(padding: EdgeInsets.only(top: 8), child: Text("Now", style: TextStyle(fontSize: 10, color: Colors.white54)));
+                                if (hoursDiff == 0) return const Padding(padding: EdgeInsets.only(top: 8), child: Text("Now", style: TextStyle(fontSize: 10, color: AppTheme.textSecondary)));
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text("-$hoursDiff h", style: const TextStyle(fontSize: 10, color: Colors.white54)),
+                                  child: Text("-$hoursDiff h", style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary)),
                                 );
                             }
                             return const SizedBox.shrink();

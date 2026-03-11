@@ -93,10 +93,10 @@ class _EmergencyOverlayState extends State<_EmergencyOverlay> with SingleTickerP
                     const SizedBox(height: 40),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.surface,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppTheme.neonRed,
                         padding: const EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       icon: const Icon(Icons.phone_in_talk, size: 28),
                       label: const Text("EMERGENCY DIAL DOCTOR", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -109,17 +109,17 @@ class _EmergencyOverlayState extends State<_EmergencyOverlay> with SingleTickerP
                       },
                     ),
                     const Spacer(),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppTheme.neonRed,
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white, width: 2),
                         padding: const EdgeInsets.symmetric(vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () {
                         context.read<AppProvider>().dismissEmergency();
                       },
-                      child: Text("DISMISS ALERT", style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppTheme.neonRed)),
+                      child: Text("DISMISS ALERT", style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white)),
                     ),
                   ],
                 ),

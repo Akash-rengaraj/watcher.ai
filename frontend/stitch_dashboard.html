@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Post-Op Watch - Live Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a2a47",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#14181e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Top Navigation / Header -->
+<header class="bg-white dark:bg-slate-900 px-4 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20">
+<img class="w-full h-full object-cover" data-alt="Profile portrait of patient John Doe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2rybetnxkZF0efOVJKJ8TM5lIgT4B8DKLDFvs0xAl17gVS2aVcPv0L4g0TyONKdF92Mwi4XnW7YuQGPMBIXzizDp6eK0b2T94kiv0Hw83UlNNtkpGRQCN2cyaGBKe-GsJtmnX74tdYZ07wt20RQ_Xq03vp7rRe3OFyBBtHwKthziGsuS5fa2HtL-Qxolbkkoh1L-4EzaRu-uFLdX61IvbgANMvuIXjJmemqecI_f4wT7HJpVzufWYZYeYBE3Afz9Rpi2igas1G5ym"/>
+</div>
+<div>
+<h1 class="text-base font-bold leading-tight">John Doe</h1>
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<p class="text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">Device: Connected</p>
+</div>
+</div>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">notifications</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Main Feature: Health Score Ring -->
+<section class="p-6 flex flex-col items-center justify-center">
+<div class="relative flex items-center justify-center">
+<!-- Circular Ring Background -->
+<svg class="size-48 transform -rotate-90">
+<circle class="text-slate-200 dark:text-slate-800" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="552.92" stroke-dashoffset="33.17" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center text-center">
+<span class="text-5xl font-bold tracking-tight text-primary dark:text-slate-100">94</span>
+<span class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 mt-1">Stable</span>
+</div>
+</div>
+<p class="mt-4 text-sm font-medium text-slate-500 dark:text-slate-400">Overall Health Score</p>
+</section>
+<!-- AI Status Card -->
+<section class="px-4 mb-6">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 flex items-start gap-4">
+<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="text-sm font-bold text-primary dark:text-slate-100 uppercase tracking-wide">AI Health Status</h3>
+<span class="text-[10px] font-medium text-slate-400">Just Now</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        John's vitals are within normal range for 4 hours. No action needed.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Vital Cards Grid -->
+<section class="px-4">
+<h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 px-1">Live Vitals</h3>
+<div class="grid grid-cols-2 gap-4">
+<!-- Heart Rate -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-red-500 text-lg">favorite</span>
+<span class="text-[10px] font-bold text-slate-400 uppercase">BPM</span>
+</div>
+<div class="flex items-end gap-1 mb-2">
+<span class="text-2xl font-bold">72</span>
+<span class="material-symbols-outlined text-emerald-500 text-sm mb-1">trending_flat</span>
+</div>
+<p class="text-xs font-medium text-slate-500 mb-2">Heart Rate</p>
+<div class="h-8 w-full bg-slate-50 dark:bg-slate-800 rounded flex items-center px-1">
+<div class="w-full h-4 bg-gradient-to-r from-red-400 via-red-300 to-red-400 rounded-full opacity-40"></div>
+</div>
+</div>
+<!-- SpO2 -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-blue-500 text-lg">water_drop</span>
+<span class="text-[10px] font-bold text-slate-400 uppercase">%</span>
+</div>
+<div class="flex items-end gap-1 mb-2">
+<span class="text-2xl font-bold">98</span>
+<span class="material-symbols-outlined text-emerald-500 text-sm mb-1">expand_less</span>
+</div>
+<p class="text-xs font-medium text-slate-500 mb-2">SpO2</p>
+<div class="h-8 w-full bg-slate-50 dark:bg-slate-800 rounded flex items-center px-1">
+<div class="w-full h-4 bg-gradient-to-r from-blue-400 via-blue-200 to-blue-400 rounded-full opacity-40"></div>
+</div>
+</div>
+<!-- Temperature -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-orange-400 text-lg">device_thermostat</span>
+<span class="text-[10px] font-bold text-slate-400 uppercase">°F</span>
+</div>
+<div class="flex items-end gap-1 mb-2">
+<span class="text-2xl font-bold">98.6</span>
+</div>
+<p class="text-xs font-medium text-slate-500">Body Temp</p>
+</div>
+<!-- Blood Pressure -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-purple-500 text-lg">blood_pressure</span>
+<span class="text-[10px] font-bold text-slate-400 uppercase">mmHg</span>
+</div>
+<div class="flex items-end gap-1 mb-2">
+<span class="text-2xl font-bold leading-none">120/80</span>
+</div>
+<p class="text-xs font-medium text-slate-500">Blood Pressure</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pb-safe-area-inset-bottom">
+<div class="flex h-16 items-center justify-around px-2">
+<a class="flex flex-col items-center justify-center gap-1 flex-1 text-primary dark:text-slate-100" href="#">
+<span class="material-symbols-outlined active-icon">dashboard</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 flex-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Trends</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 flex-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">vital_signs</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 flex-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Actions</span>
+</a>
+</div>
+</nav>
+</body></html>

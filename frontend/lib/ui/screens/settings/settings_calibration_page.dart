@@ -86,7 +86,7 @@ class SettingsCalibrationPage extends StatelessWidget {
                   title: Text("Push Notifications", style: Theme.of(context).textTheme.bodyLarge),
                   subtitle: Text("Alerts for abnormal vitals", style: Theme.of(context).textTheme.bodyMedium),
                   value: settings.enableNotifications,
-                  activeColor: AppTheme.mistyGreen,
+                  activeColor: AppTheme.primary,
                   onChanged: (val) => provider.toggleNotifications(val),
                 ),
               ),
@@ -116,10 +116,10 @@ class SettingsCalibrationPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.mistyGreen.withOpacity(0.1),
+                color: AppTheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.developer_board, color: AppTheme.mistyGreen, size: 32),
+              child: const Icon(Icons.developer_board, color: AppTheme.primary, size: 32),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -141,7 +141,7 @@ class SettingsCalibrationPage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Icon(Icons.battery_5_bar, color: AppTheme.mistyGreen),
+                const Icon(Icons.battery_5_bar, color: AppTheme.textSecondary),
                 const SizedBox(height: 4),
                 Text("84%", style: Theme.of(context).textTheme.labelSmall),
               ],
@@ -159,9 +159,9 @@ class SettingsCalibrationPage extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(value, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: AppTheme.mistyGreen)),
+            Text(value, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: AppTheme.primary)),
             const SizedBox(width: 8),
-            const Icon(Icons.edit, size: 18, color: AppTheme.textSecondary),
+            const Icon(Icons.edit, size: 18, color: AppTheme.primary),
           ],
         ),
         onTap: onTap,
@@ -183,7 +183,7 @@ class SettingsCalibrationPage extends StatelessWidget {
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.textSecondary)),
-              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.mistyGreen)),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.primary)),
             ),
           ),
           actions: [
@@ -196,7 +196,7 @@ class SettingsCalibrationPage extends StatelessWidget {
                 onSave(controller.text);
                 Navigator.pop(context);
               },
-              child: const Text("Save", style: TextStyle(color: AppTheme.mistyGreen, fontWeight: FontWeight.bold)),
+              child: const Text("Save", style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
             ),
           ],
         );

@@ -24,7 +24,7 @@ class PatientMonitorApp extends StatelessWidget {
     return MaterialApp(
       title: 'Health Monitor',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       home: const MainScaffold(),
     );
   }

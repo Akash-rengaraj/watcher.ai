@@ -48,18 +48,18 @@ class AIInsightsPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(24.0),
         decoration: BoxDecoration(
-          color: AppTheme.mistyGreen.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppTheme.mistyGreen.withOpacity(0.3)),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.auto_awesome, color: AppTheme.mistyGreen),
+                const Icon(Icons.auto_awesome, color: AppTheme.primary),
                 const SizedBox(width: 8),
-                Text("Daily Briefing", style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppTheme.mistyGreen)),
+                Text("Daily Briefing", style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppTheme.primary)),
               ],
             ),
             const SizedBox(height: 12),
@@ -67,7 +67,7 @@ class AIInsightsPage extends StatelessWidget {
               "Patient has remained largely stable over the last 24 hours. "
               "A minor SpO2 dip was noted early morning but auto-resolved. "
               "Vitals are trending positively. No immediate intervention recommended.",
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.5),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.5, color: AppTheme.textSecondary),
             ),
           ],
         ),
@@ -91,7 +91,7 @@ class AIInsightsPage extends StatelessWidget {
               height: 12,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isWarning ? AppTheme.harshAmber : AppTheme.mistyGreen,
+                color: isWarning ? AppTheme.harshAmber : AppTheme.primary,
               ),
             ),
           ),
@@ -104,7 +104,8 @@ class AIInsightsPage extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: isWarning ? AppTheme.harshAmber.withOpacity(0.3) : Colors.transparent,
+                    color: isWarning ? AppTheme.harshAmber.withAlpha(100) : const Color(0xFFE2E8F0),
+                    width: 1,
                   )
                 ),
                 child: Padding(
