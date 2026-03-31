@@ -160,6 +160,7 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
 # --- FastAPI Endpoints ---
 
 @app.get("/")
+@app.head("/")
 def read_root():
     return {"message": "VitalBridge AI Backend is LIVE"}
 
