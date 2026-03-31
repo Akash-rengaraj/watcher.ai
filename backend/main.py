@@ -6,11 +6,11 @@ from datetime import datetime, timezone
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from google import genai
+from groq import Groq
 
 load_dotenv()
 
-client = genai.Client()
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 app = FastAPI()
 
@@ -111,9 +111,12 @@ def generate_ai_wellness_plan(measured: dict, calculated: dict) -> dict:
     # Throttle AI calls to once every 60 seconds to avoid API quota limits
     if current_time - _last_ai_time < 60.0:
         return _cached_wellness_plan
+        
+    # Lock the cache timer immediately so failures don't cause spam retries
+    _last_ai_time = current_time
     """
     Generates an elaborate AI action plan consisting of general wellness guidelines
-    (non-medical). Uses Gemini 2.0 Flash to ensure standard free-tier quotas.
+    (non-medical). Uses Groq llama3-8b-8192.
     """
     fallback_plan = {
         "immediate_actions": [
@@ -126,8 +129,7 @@ def generate_ai_wellness_plan(measured: dict, calculated: dict) -> dict:
     }
     
     try:
-        prompt = f"""
-You are an AI wellness assistant connected to an IoT health monitor.
+        user_prompt = f"""
 Generate a structured, non-medical wellness plan based on the following real-time vitals:
 
 Measured Data:
@@ -153,12 +155,22 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
   "disclaimer": "Short disclaimer stating this is general wellness guidance, not medical advice."
 }}
 """
-        response = client.models.generate_content(
-            model='gemini-2.0-flash',
-            contents=prompt,
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a brief, direct health assistant. You must output only raw, valid JSON matching the requested structure."
+                },
+                {
+                    "role": "user",
+                    "content": user_prompt
+                }
+            ],
+            model="llama3-8b-8192",
+            temperature=0.2,
         )
 
-        raw_text = response.text.strip()
+        raw_text = chat_completion.choices[0].message.content.strip()
         if raw_text.startswith("```json"):
             raw_text = raw_text[7:]
         if raw_text.startswith("```"):
@@ -168,7 +180,6 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
             
         parsed_json = json.loads(raw_text.strip())
         _cached_wellness_plan = parsed_json
-        _last_ai_time = current_time
         return parsed_json
     except Exception as e:
         print(f"AI Generation Error: {e}")
