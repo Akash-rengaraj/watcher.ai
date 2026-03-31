@@ -21,10 +21,10 @@ class AppProvider with ChangeNotifier {
   Timer? _timer;
 
   AppProvider() {
-  // Simulate real-time data updates every 2 seconds
+  // Fetch real ESP32 data from backend every 2 seconds
     _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
       if (!_isEmergencyActive) {
-        _generateNewMockVital();
+        _fetchRealVitals();
       }
     });
   }
@@ -118,79 +118,51 @@ class AppProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Real-time generator
-  void _generateNewMockVital() {
-    var last = _vitals.last;
-    
-    // Smooth realistic fluctuations
-    // HR tends to fluctuate slightly, staying mostly near 60-75 when stable
-    int randomHRFluctuation = (DateTime.now().millisecond % 5) - 2; 
-    int newHR = last.heartRate + randomHRFluctuation;
-    // Slowly pull back to 65 if drifting too high or low
-    if (newHR > 70) newHR -= 1;
-    if (newHR < 60) newHR += 1;
-
-    // SpO2 stays high, 98-100
-    int randomSpO2Fluctuation = (DateTime.now().millisecond % 3) - 1;
-    int newSpO2 = (last.spO2 + randomSpO2Fluctuation);
-    if (newSpO2 < 98) newSpO2 = 98;
-    if (newSpO2 > 100) newSpO2 = 100;
-
-    var newData = VitalData(
-      timestamp: DateTime.now(),
-      heartRate: newHR.clamp(40, 180),
-      spO2: newSpO2.clamp(80, 100),
-      temperature: last.temperature,
-      systolicBP: last.systolicBP,
-      diastolicBP: last.diastolicBP,
-    );
-
-    _vitals.add(newData);
-    // Keep list manageable for the mock
-    if (_vitals.length > 200) _vitals.removeAt(0);
-
-    notifyListeners();
-    
-    // Process via Remote Backend
-    _syncWithRemoteBackend(newData);
-  }
-
-  Future<void> _syncWithRemoteBackend(VitalData newData) async {
+  // Real-time ESP32 Fetcher
+  Future<void> _fetchRealVitals() async {
     try {
-      final url = Uri.parse('https://watcher-ai-79fv.onrender.com/update');
-      final body = jsonEncode({
-        "bpm": newData.heartRate.toDouble(),
-        "temp": newData.temperature.toDouble(),
-        "pressure": 1013.25,
-        "spo2": newData.spO2.toDouble()
-      });
-      
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: body,
-      );
+      final url = Uri.parse('https://watcher-ai-79fv.onrender.com/vitals');
+      final response = await http.get(url);
       
       if (response.statusCode == 200) {
         final respData = jsonDecode(response.body);
+        if (respData['data'] == null) return; // Still waiting for sensor
+        
+        final measured = respData['data']['measured'];
         final detailedPlan = respData['detailed_wellness_plan'];
         
-        final String newDescription = detailedPlan['immediate_actions'][0].toString();
-        final String envStr = detailedPlan['hydration_and_environment'].toString();
-        final String monitorStr = detailedPlan['monitoring_advice'].toString();
+        var newData = VitalData(
+          timestamp: DateTime.now(),
+          heartRate: (measured['bpm'] as num).toInt(),
+          spO2: (measured['spo2'] as num).toInt(),
+          temperature: (measured['temp'] as num).toDouble(),
+          systolicBP: _vitals.isNotEmpty ? _vitals.last.systolicBP : 120, // Keep mock BP since sensor doesn't have it
+          diastolicBP: _vitals.isNotEmpty ? _vitals.last.diastolicBP : 80,
+        );
+
+        // Prevent rapid UI flickering if the ESP32 hasn't pushed a new data point yet
+        if (_vitals.isEmpty || _vitals.last.heartRate != newData.heartRate || _vitals.last.spO2 != newData.spO2) {
+          _vitals.add(newData);
+          if (_vitals.length > 200) _vitals.removeAt(0);
+        }
         
-        _aiDailyBriefing = "$envStr\n$monitorStr\n\nNote: ${detailedPlan['disclaimer']}";
-        
-        // Only insert log if it has changed from the last one (backend throttles this to 1/min)
-        if (_aiLogs.isEmpty || _aiLogs.first.description != newDescription) {
-          final newAiLog = AILogEvent(
-            timestamp: DateTime.now(),
-            title: "Live Action Plan",
-            description: newDescription,
-            isWarning: newData.spO2 < 95 || newData.heartRate > 100,
-          );
-          _aiLogs.insert(0, newAiLog);
-          if (_aiLogs.length > 50) _aiLogs.removeLast();
+        if (detailedPlan != null) {
+          final String newDescription = detailedPlan['immediate_actions'][0].toString();
+          final String envStr = detailedPlan['hydration_and_environment'].toString();
+          final String monitorStr = detailedPlan['monitoring_advice'].toString();
+          
+          _aiDailyBriefing = "$envStr\n$monitorStr\n\nNote: ${detailedPlan['disclaimer']}";
+          
+          if (_aiLogs.isEmpty || _aiLogs.first.description != newDescription) {
+            final newAiLog = AILogEvent(
+              timestamp: DateTime.now(),
+              title: "Live Action Plan",
+              description: newDescription,
+              isWarning: newData.spO2 < 95 || newData.heartRate > 100,
+            );
+            _aiLogs.insert(0, newAiLog);
+            if (_aiLogs.length > 50) _aiLogs.removeLast();
+          }
         }
         notifyListeners();
       }

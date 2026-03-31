@@ -197,6 +197,12 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
 
 # --- FastAPI Endpoints ---
 
+latest_sensor_state = {
+    "status": "Waiting for ESP32 sensor data...",
+    "data": None,
+    "detailed_wellness_plan": None
+}
+
 @app.get("/")
 @app.head("/")
 def read_root():
@@ -208,6 +214,7 @@ def options_update():
 
 @app.post("/update")
 def update_vitals(data: SensorData):
+    global latest_sensor_state
     measured = data.model_dump()
     
     # Process derived metrics
@@ -233,4 +240,13 @@ def update_vitals(data: SensorData):
         "detailed_wellness_plan": detailed_wellness_plan
     }
     
+    latest_sensor_state = response_payload
     return response_payload
+
+@app.get("/vitals")
+def get_vitals():
+    return latest_sensor_state
+
+@app.options("/vitals")
+def options_vitals():
+    return {"message": "OK"}
