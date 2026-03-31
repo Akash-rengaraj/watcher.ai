@@ -113,7 +113,7 @@ def generate_ai_wellness_plan(measured: dict, calculated: dict) -> dict:
         return _cached_wellness_plan
     """
     Generates an elaborate AI action plan consisting of general wellness guidelines
-    (non-medical). Uses Gemini 2.5 Flash as specified in previous user changes.
+    (non-medical). Uses Gemini 2.0 Flash to ensure standard free-tier quotas.
     """
     fallback_plan = {
         "immediate_actions": [
@@ -154,7 +154,7 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
 }}
 """
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-2.0-flash',
             contents=prompt,
         )
 
