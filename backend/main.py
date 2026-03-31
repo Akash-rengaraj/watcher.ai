@@ -166,7 +166,7 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
                     "content": user_prompt
                 }
             ],
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             temperature=0.2,
         )
 
