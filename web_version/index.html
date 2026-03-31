@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-Time Health Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-50 text-slate-800 min-h-screen p-8 font-sans">
+    <div class="max-w-4xl mx-auto space-y-6">
+      <!-- AI Banner -->
+      <div
+        class="bg-blue-600 rounded-xl p-6 text-white shadow-lg shadow-blue-600/20 transition-all duration-300"
+      >
+        <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
+          <svg
+            class="w-6 h-6 animate-pulse"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            ></path>
+          </svg>
+          AI Wellness Assistant
+        </h2>
+        <p id="ai-suggestion" class="text-lg opacity-90 leading-relaxed">
+          Gathering initial vitals. AI analysis will begin shortly...
+        </p>
+      </div>
+
+      <!-- 2x2 Clean Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
+        >
+          <h3
+            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
+          >
+            Heart Rate
+          </h3>
+          <div class="flex items-baseline gap-2">
+            <span id="val-bpm" class="text-6xl font-black text-rose-500"
+              >--</span
+            >
+            <span class="text-slate-400 font-medium">BPM</span>
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
+        >
+          <h3
+            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
+          >
+            Blood Oxygen
+          </h3>
+          <div class="flex items-baseline gap-2">
+            <span id="val-spo2" class="text-6xl font-black text-sky-500"
+              >--</span
+            >
+            <span class="text-slate-400 font-medium">%</span>
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
+        >
+          <h3
+            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
+          >
+            Body Temp
+          </h3>
+          <div class="flex items-baseline gap-2">
+            <span id="val-temp" class="text-5xl font-bold text-orange-500"
+              >--</span
+            >
+            <span class="text-slate-400 font-medium">°C</span>
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
+        >
+          <h3
+            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
+          >
+            Env Pressure
+          </h3>
+          <div class="flex items-baseline gap-2">
+            <span id="val-pressure" class="text-5xl font-bold text-indigo-500"
+              >--</span
+            >
+            <span class="text-slate-400 font-medium">hPa</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status indicator -->
+      <div class="flex justify-center mt-8">
+        <div
+          id="connection-status"
+          class="px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold flex items-center gap-2"
+        >
+          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          Connecting...
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = "http://127.0.0.1:7860/vitals";
+      let isConnected = false;
+
+      setInterval(async () => {
+        try {
+          const res = await fetch(API_URL);
+          if (!res.ok) throw new Error("Network response was not ok");
+          const data = await res.json();
+
+          document.getElementById("ai-suggestion").textContent =
+            data.ai_suggestion;
+
+          // Add tiny animation classes on data refresh
+          const updateStat = (id, val) => {
+            const el = document.getElementById(id);
+            if (el.textContent != val) {
+              el.textContent = val;
+              el.classList.add("scale-110");
+              setTimeout(() => el.classList.remove("scale-110"), 200);
+            }
+          };
+
+          updateStat("val-bpm", data.vitals.bpm);
+          updateStat("val-spo2", data.vitals.spo2);
+          updateStat("val-temp", data.vitals.temp);
+          updateStat("val-pressure", data.vitals.pressure);
+
+          if (!isConnected) {
+            const statusEl = document.getElementById("connection-status");
+            statusEl.innerHTML =
+              '<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>Live Backend Active';
+            statusEl.className =
+              "px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold flex items-center gap-2 transition-colors";
+            isConnected = true;
+          }
+        } catch (error) {
+          const statusEl = document.getElementById("connection-status");
+          statusEl.innerHTML =
+            '<div class="w-2 h-2 rounded-full bg-rose-500"></div>Backend Offline';
+          statusEl.className =
+            "px-4 py-2 rounded-full bg-rose-100 text-rose-700 text-sm font-semibold flex items-center gap-2 transition-colors";
+          isConnected = false;
+        }
+      }, 1000);
+    </script>
+  </body>
+</html>
