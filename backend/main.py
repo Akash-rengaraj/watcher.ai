@@ -4,15 +4,12 @@ import json
 from datetime import datetime, timezone
 from fastapi import FastAPI
 from pydantic import BaseModel
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
-# Try to load from environment variable first, then fallback to hardcoded value
-api_key = os.environ.get("GEMINI_API_KEY") or "AIzaSyC6s72SujAcf68J84WjPIv1uqWLJ47FBGE"
-if api_key:
-    genai.configure(api_key=api_key.strip())
+client = genai.Client()
 
 app = FastAPI()
 
@@ -114,8 +111,6 @@ def generate_ai_wellness_plan(measured: dict, calculated: dict) -> dict:
     }
     
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash")
-        
         prompt = f"""
 You are an AI wellness assistant connected to an IoT health monitor.
 Generate a structured, non-medical wellness plan based on the following real-time vitals:
@@ -143,7 +138,10 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
   "disclaimer": "Short disclaimer stating this is general wellness guidance, not medical advice."
 }}
 """
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
 
         raw_text = response.text.strip()
         if raw_text.startswith("```json"):
