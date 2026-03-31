@@ -64,9 +64,7 @@ class AIInsightsPage extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              "Patient has remained largely stable over the last 24 hours. "
-              "A minor SpO2 dip was noted early morning but auto-resolved. "
-              "Vitals are trending positively. No immediate intervention recommended.",
+              Provider.of<AppProvider>(context).aiDailyBriefing,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.5, color: AppTheme.textSecondary),
             ),
           ],

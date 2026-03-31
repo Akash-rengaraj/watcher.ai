@@ -4,15 +4,25 @@ import math
 import json
 from datetime import datetime, timezone
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from groq import Groq
 
 load_dotenv()
-
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+# Initialize with a fallback string so local Uvicorn doesn't crash if .env is missing
+api_key = os.environ.get("GROQ_API_KEY", "missing_key")
+client = Groq(api_key=api_key)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False, # Must be False when origin is "*" to prevent strict CORS rejection 
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class SensorData(BaseModel):
     bpm: float
@@ -191,6 +201,10 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
 @app.head("/")
 def read_root():
     return {"message": "VitalBridge AI Backend is LIVE"}
+
+@app.options("/update")
+def options_update():
+    return {"message": "OK"}
 
 @app.post("/update")
 def update_vitals(data: SensorData):

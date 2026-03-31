@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../data/mock_data.dart';
 
 class AppProvider with ChangeNotifier {
@@ -11,6 +13,9 @@ class AppProvider with ChangeNotifier {
   // Emergency State
   bool _isEmergencyActive = false;
   String _emergencyContext = "";
+  
+  // Dynamic AI State
+  String _aiDailyBriefing = "Connecting to remote AI Insights server...";
 
   // Real-time mockup
   Timer? _timer;
@@ -30,6 +35,7 @@ class AppProvider with ChangeNotifier {
   UserSettings get settings => _settings;
   bool get isEmergencyActive => _isEmergencyActive;
   String get emergencyContext => _emergencyContext;
+  String get aiDailyBriefing => _aiDailyBriefing;
 
   VitalData get currentVitals => _vitals.last;
   
@@ -144,6 +150,53 @@ class AppProvider with ChangeNotifier {
     if (_vitals.length > 200) _vitals.removeAt(0);
 
     notifyListeners();
+    
+    // Process via Remote Backend
+    _syncWithRemoteBackend(newData);
+  }
+
+  Future<void> _syncWithRemoteBackend(VitalData newData) async {
+    try {
+      final url = Uri.parse('https://watcher-ai-79fv.onrender.com/update');
+      final body = jsonEncode({
+        "bpm": newData.heartRate.toDouble(),
+        "temp": newData.temperature.toDouble(),
+        "pressure": 1013.25,
+        "spo2": newData.spO2.toDouble()
+      });
+      
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: body,
+      );
+      
+      if (response.statusCode == 200) {
+        final respData = jsonDecode(response.body);
+        final detailedPlan = respData['detailed_wellness_plan'];
+        
+        final String newDescription = detailedPlan['immediate_actions'][0].toString();
+        final String envStr = detailedPlan['hydration_and_environment'].toString();
+        final String monitorStr = detailedPlan['monitoring_advice'].toString();
+        
+        _aiDailyBriefing = "$envStr\n$monitorStr\n\nNote: ${detailedPlan['disclaimer']}";
+        
+        // Only insert log if it has changed from the last one (backend throttles this to 1/min)
+        if (_aiLogs.isEmpty || _aiLogs.first.description != newDescription) {
+          final newAiLog = AILogEvent(
+            timestamp: DateTime.now(),
+            title: "Live Action Plan",
+            description: newDescription,
+            isWarning: newData.spO2 < 95 || newData.heartRate > 100,
+          );
+          _aiLogs.insert(0, newAiLog);
+          if (_aiLogs.length > 50) _aiLogs.removeLast();
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("API Error: $e");
+    }
   }
 
   @override
