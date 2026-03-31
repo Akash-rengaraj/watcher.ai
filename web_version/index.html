@@ -1,162 +1,138 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Real-Time Health Dashboard</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalBridge Pro - Medical Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-slate-50 text-slate-800 min-h-screen p-8 font-sans">
-    <div class="max-w-4xl mx-auto space-y-6">
-      <!-- AI Banner -->
-      <div
-        class="bg-blue-600 rounded-xl p-6 text-white shadow-lg shadow-blue-600/20 transition-all duration-300"
-      >
-        <h2 class="text-xl font-bold mb-3 flex items-center gap-2">
-          <svg
-            class="w-6 h-6 animate-pulse"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            ></path>
-          </svg>
-          AI Wellness Assistant
-        </h2>
-        <p id="ai-suggestion" class="text-lg opacity-90 leading-relaxed">
-          Gathering initial vitals. AI analysis will begin shortly...
-        </p>
-      </div>
-
-      <!-- 2x2 Clean Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div
-          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
-        >
-          <h3
-            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
-          >
-            Heart Rate
-          </h3>
-          <div class="flex items-baseline gap-2">
-            <span id="val-bpm" class="text-6xl font-black text-rose-500"
-              >--</span
-            >
-            <span class="text-slate-400 font-medium">BPM</span>
-          </div>
+    <style>
+        .vital-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            box-shadow: 4px 4px 10px #0a0f1c, -4px -4px 10px #1e2b40;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .text-glow {
+            text-shadow: 0 0 15px currentColor;
+        }
+    </style>
+</head>
+<body class="bg-[#0b1120] text-slate-300 min-h-screen p-4 md:p-8 font-mono">
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+            <h1 class="text-3xl font-black text-white tracking-widest uppercase">
+                <span class="text-emerald-500">VITAL</span>BRIDGE PRO
+            </h1>
+            <div id="connection-status" class="px-3 py-1 rounded border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 bg-emerald-500/10 tracking-widest">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                SYSTEM ONLINE
+            </div>
         </div>
 
-        <div
-          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
-        >
-          <h3
-            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
-          >
-            Blood Oxygen
-          </h3>
-          <div class="flex items-baseline gap-2">
-            <span id="val-spo2" class="text-6xl font-black text-sky-500"
-              >--</span
-            >
-            <span class="text-slate-400 font-medium">%</span>
-          </div>
+        <!-- AI Banner -->
+        <div class="vital-card rounded-xl p-6 text-white border-l-4 border-l-blue-500 transition-all duration-300 relative overflow-hidden">
+            <div class="absolute inset-0 bg-blue-500/5 mix-blend-overlay"></div>
+            <h2 class="text-sm font-bold text-blue-400 mb-2 uppercase tracking-widest flex items-center gap-2 relative z-10">
+                <svg class="w-4 h-4 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                Groq Neural Assessment
+            </h2>
+            <p id="ai-suggestion" class="text-xl font-light leading-relaxed text-slate-200 relative z-10">Initializing neural engine. Standing by for telemetry...</p>
         </div>
 
-        <div
-          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
-        >
-          <h3
-            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
-          >
-            Body Temp
-          </h3>
-          <div class="flex items-baseline gap-2">
-            <span id="val-temp" class="text-5xl font-bold text-orange-500"
-              >--</span
-            >
-            <span class="text-slate-400 font-medium">°C</span>
-          </div>
+        <!-- Massive 5x4 Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" id="metrics-grid">
+            <!-- Cards will be injected here by JS -->
         </div>
-
-        <div
-          class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center hover:-translate-y-1 hover:shadow-md transition-all"
-        >
-          <h3
-            class="text-slate-500 font-medium mb-2 uppercase tracking-wide text-xs"
-          >
-            Env Pressure
-          </h3>
-          <div class="flex items-baseline gap-2">
-            <span id="val-pressure" class="text-5xl font-bold text-indigo-500"
-              >--</span
-            >
-            <span class="text-slate-400 font-medium">hPa</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Status indicator -->
-      <div class="flex justify-center mt-8">
-        <div
-          id="connection-status"
-          class="px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold flex items-center gap-2"
-        >
-          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-          Connecting...
-        </div>
-      </div>
+        
     </div>
 
     <script>
-      const API_URL = "http://127.0.0.1:7860/vitals";
-      let isConnected = false;
+        // The 19 metrics we expect from the backend
+        const metricsConfig = [
+            { key: 'BPM', title: 'Heart Rate', unit: 'BPM', color: 'text-rose-500' },
+            { key: 'SpO2', title: 'SpO2', unit: '%', color: 'text-sky-400' },
+            { key: 'Temp_C', title: 'Core Temp', unit: '°C', color: 'text-orange-400' },
+            { key: 'Pressure_hPa', title: 'Env Press', unit: 'hPa', color: 'text-indigo-400' },
+            
+            { key: 'Respiratory_Rate', title: 'Resp Rate', unit: 'br/m', color: 'text-emerald-400' },
+            { key: 'Max_Heart_Rate', title: 'Max HR', unit: 'BPM', color: 'text-slate-400' },
+            { key: 'Heart_Rate_Reserve', title: 'HR Reserve', unit: 'BPM', color: 'text-purple-400' },
+            { key: 'Cardiac_Output_mL', title: 'Cardiac Output', unit: 'mL', color: 'text-rose-300' },
+            
+            { key: 'Blood_Oxygen_Status', title: 'O2 Status', unit: '', color: 'text-sky-300', isString: true },
+            { key: 'Temp_F', title: 'Temp (F)', unit: '°F', color: 'text-orange-300' },
+            { key: 'Altitude_m', title: 'Est Altitude', unit: 'm', color: 'text-slate-400' },
+            { key: 'Boiling_Point_C', title: 'H2O Boiling Pt', unit: '°C', color: 'text-blue-300' },
+            
+            { key: 'BMR_Hourly_kcal', title: 'BMR Burn', unit: 'kCal/h', color: 'text-yellow-400' },
+            { key: 'Stress_Index', title: 'Stress Idx', unit: 'x', color: 'text-fuchsia-400' },
+            { key: 'MAP_mmHg', title: 'MAP (Est)', unit: 'mmHg', color: 'text-red-400' },
+            { key: 'Oxygen_Content_CaO2', title: 'Est CaO2', unit: 'mL/dL', color: 'text-cyan-400' },
+            
+            { key: 'Lung_Volume_L', title: 'Tidal Vol', unit: 'L/m', color: 'text-teal-400' },
+            { key: 'System_Latency_ms', title: 'Sys Latency', unit: 'ms', color: 'text-slate-500' },
+            { key: 'Perfusion_Index', title: 'Perfusion Idx', unit: '%', color: 'text-pink-400' },
+        ];
 
-      setInterval(async () => {
-        try {
-          const res = await fetch(API_URL);
-          if (!res.ok) throw new Error("Network response was not ok");
-          const data = await res.json();
+        // Setup DOM
+        const grid = document.getElementById('metrics-grid');
+        metricsConfig.forEach(m => {
+            const card = document.createElement('div');
+            card.className = "vital-card rounded-xl p-5 flex flex-col justify-between transition-all duration-300";
+            card.innerHTML = `
+                <h3 class="text-slate-400 font-bold mb-3 uppercase tracking-wider text-[10px] md:text-xs">${m.title}</h3>
+                <div class="flex items-baseline gap-1 md:gap-2">
+                    <span id="val-${m.key}" class="text-3xl md:text-5xl font-black ${m.color} text-glow transition-all duration-200">--</span>
+                    ${m.unit ? `<span class="text-slate-500 font-bold text-xs md:text-sm">${m.unit}</span>` : ''}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
 
-          document.getElementById("ai-suggestion").textContent =
-            data.ai_suggestion;
-
-          // Add tiny animation classes on data refresh
-          const updateStat = (id, val) => {
-            const el = document.getElementById(id);
-            if (el.textContent != val) {
-              el.textContent = val;
-              el.classList.add("scale-110");
-              setTimeout(() => el.classList.remove("scale-110"), 200);
+        const API_URL = 'http://127.0.0.1:7860/vitals';
+        let isConnected = true;
+        
+        setInterval(async () => {
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error("Network response was not ok");
+                const data = await res.json();
+                
+                document.getElementById('ai-suggestion').textContent = data.ai_suggestion;
+                
+                // Update all grid elements dynamically
+                if(data.vitals && Object.keys(data.vitals).length > 0) {
+                    metricsConfig.forEach(m => {
+                        const el = document.getElementById(`val-${m.key}`);
+                        if (el && data.vitals[m.key] !== undefined) {
+                            if (el.textContent != data.vitals[m.key]) {
+                                el.textContent = data.vitals[m.key];
+                                // Flashing animation on change
+                                el.style.transform = 'scale(1.05)';
+                                el.style.filter = 'brightness(1.5)';
+                                setTimeout(() => {
+                                    el.style.transform = 'scale(1)';
+                                    el.style.filter = 'brightness(1)';
+                                }, 150);
+                            }
+                        }
+                    });
+                }
+                
+                if (!isConnected) {
+                    const statusEl = document.getElementById('connection-status');
+                    statusEl.innerHTML = '<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>SYSTEM ONLINE';
+                    statusEl.className = 'px-3 py-1 rounded border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 bg-emerald-500/10 tracking-widest transition-colors';
+                    isConnected = true;
+                }
+            } catch (error) {
+                const statusEl = document.getElementById('connection-status');
+                statusEl.innerHTML = '<div class="w-2 h-2 rounded-full bg-rose-500"></div>SENSOR OFFLINE';
+                statusEl.className = 'px-3 py-1 rounded border border-rose-500/30 text-rose-500 text-xs font-bold flex items-center gap-2 bg-rose-500/10 tracking-widest transition-colors';
+                isConnected = false;
             }
-          };
-
-          updateStat("val-bpm", data.vitals.bpm);
-          updateStat("val-spo2", data.vitals.spo2);
-          updateStat("val-temp", data.vitals.temp);
-          updateStat("val-pressure", data.vitals.pressure);
-
-          if (!isConnected) {
-            const statusEl = document.getElementById("connection-status");
-            statusEl.innerHTML =
-              '<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>Live Backend Active';
-            statusEl.className =
-              "px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold flex items-center gap-2 transition-colors";
-            isConnected = true;
-          }
-        } catch (error) {
-          const statusEl = document.getElementById("connection-status");
-          statusEl.innerHTML =
-            '<div class="w-2 h-2 rounded-full bg-rose-500"></div>Backend Offline';
-          statusEl.className =
-            "px-4 py-2 rounded-full bg-rose-100 text-rose-700 text-sm font-semibold flex items-center gap-2 transition-colors";
-          isConnected = false;
-        }
-      }, 1000);
+        }, 1000);
     </script>
-  </body>
+</body>
 </html>
