@@ -1,4 +1,5 @@
 import os
+import time
 import math
 import json
 from datetime import datetime, timezone
@@ -95,7 +96,21 @@ def compute_overall_wellness_score(bpm: float, spo2: float, ambient_temp_c: floa
 
 # --- AI Action Plan Helper ---
 
+_last_ai_time = 0.0
+_cached_wellness_plan = {
+    "immediate_actions": ["Waiting for sufficient data to generate wellness plan..."],
+    "hydration_and_environment": "Maintain comfortable environment.",
+    "monitoring_advice": "Monitor vitals.",
+    "disclaimer": "These are general wellness guidelines, not medical advice."
+}
+
 def generate_ai_wellness_plan(measured: dict, calculated: dict) -> dict:
+    global _last_ai_time, _cached_wellness_plan
+    
+    current_time = time.time()
+    # Throttle AI calls to once every 60 seconds to avoid API quota limits
+    if current_time - _last_ai_time < 60.0:
+        return _cached_wellness_plan
     """
     Generates an elaborate AI action plan consisting of general wellness guidelines
     (non-medical). Uses Gemini 2.5 Flash as specified in previous user changes.
@@ -152,6 +167,8 @@ Provide a brief, actionable non-medical first aid/wellness plan for a family mem
             raw_text = raw_text[:-3]
             
         parsed_json = json.loads(raw_text.strip())
+        _cached_wellness_plan = parsed_json
+        _last_ai_time = current_time
         return parsed_json
     except Exception as e:
         print(f"AI Generation Error: {e}")
